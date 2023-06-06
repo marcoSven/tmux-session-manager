@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# if current filter is Session (s) we don't want to return query on kill or detach
+[ ! -z $1 ] && filter=$(cat $1/filter) && [ "$filter" = "s" ] && exit 0
+
+HOME_REPLACER=""                                         
+echo "$HOME" | grep -E "^[a-zA-Z0-9\-_/.@]+$" &>/dev/null # chars safe to use in sed
+HOME_SED_SAFE=$?
+
+if [ $HOME_SED_SAFE -eq 0 ]; then # $HOME should be safe to use in sed
+	HOME_REPLACER="s|^$HOME/|~/|"
+fi
+
+zoxide query -l | sed -e "$HOME_REPLACER"
